@@ -1,0 +1,196 @@
+{
+  "info": {
+    "name": "REST API Testing - JSONPlaceholder",
+    "description": "Educational Postman collection. Uses a public demo API; write operations may not persist.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://jsonplaceholder.typicode.com"
+    }
+  ],
+  "item": [
+    {
+      "name": "GET - List posts",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/posts"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+              "pm.test('Response is JSON', () => pm.response.to.be.json);",
+              "pm.test('Response is an array', () => pm.expect(pm.response.json()).to.be.an('array'));",
+              "pm.test('Response time below 3000ms', () => pm.expect(pm.response.responseTime).to.be.below(3000));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "GET - Single post",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/posts/1"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test('Post ID is 1', () => pm.expect(body.id).to.eql(1));",
+              "pm.test('Title is a string', () => pm.expect(body.title).to.be.a('string'));",
+              "pm.test('User ID exists', () => pm.expect(body).to.have.property('userId'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "GET - Unknown post",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/posts/999999"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Unknown resource returns 404', () => pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "POST - Create post (demo)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"title\":\"QA practice post\",\"body\":\"Created during API testing practice.\",\"userId\":1}"
+        },
+        "url": "{{baseUrl}}/posts"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Create returns 201', () => pm.response.to.have.status(201));",
+              "pm.test('Response contains submitted title', () => pm.expect(pm.response.json().title).to.eql('QA practice post'));",
+              "pm.test('Response contains an ID', () => pm.expect(pm.response.json()).to.have.property('id'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "PUT - Replace post (demo)",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"id\":1,\"title\":\"Updated title\",\"body\":\"Replacement example\",\"userId\":1}"
+        },
+        "url": "{{baseUrl}}/posts/1"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('PUT returns 200', () => pm.response.to.have.status(200));",
+              "pm.test('Title is updated in response', () => pm.expect(pm.response.json().title).to.eql('Updated title'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "PATCH - Update title (demo)",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"title\":\"Patched title\"}"
+        },
+        "url": "{{baseUrl}}/posts/1"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('PATCH returns 200', () => pm.response.to.have.status(200));",
+              "pm.test('Patched title is returned', () => pm.expect(pm.response.json().title).to.eql('Patched title'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "DELETE - Delete post (demo)",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{baseUrl}}/posts/1"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('DELETE returns success', () => pm.expect(pm.response.code).to.be.oneOf([200, 204]));"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
